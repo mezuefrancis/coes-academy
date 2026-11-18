@@ -717,6 +717,7 @@ h1.pg::after{background:var(--accent)!important;width:54px;height:3px;opacity:.5
     <a href="#monops" data-v="monops">Monitoring</a>
     <a href="#casebook" data-v="casebook">Casebook</a>
     <a href="#aisec" data-v="aisec">Agentic AI</a>
+    <a href="#aidef" data-v="aidef">AI Defense</a>
     <a href="#eng" data-v="eng">Engineering</a>
     <a href="#scenarios" data-v="scen">Scenarios</a>
     <a href="#assess" data-v="assess">Self-assessment</a>
@@ -3123,6 +3124,118 @@ function renderFGblock(b){
   return "";
 }
 let FGTAB="fg1";
+function viewAidef(){
+  const AITEMS=[
+    "Inventory every place AI or machine learning touches your OT program: monitoring tools, copilots and assistants, vendor features, and any autonomous agent. You cannot govern what you have not listed.",
+    "Classify each one by consequence: what is the worst thing it could cause if it were wrong, manipulated, or hijacked? Rank by physical impact, not by how clever it is.",
+    "Confirm that no AI or agent holds standing authority to issue a control command. Every state-changing action on the process requires a named human's approval.",
+    "Give every AI the least access it needs: read-only to OT data by default, and no write path to the control plane.",
+    "Treat everything an AI reads (alerts, logs, documents, device description fields) as untrusted input that could carry a hidden instruction (indirect prompt injection).",
+    "Never pass an AI's output straight into a system that acts (a command, a database query, a firewall rule) without a human validating it first.",
+    "Log every AI query, tool-call and output, and keep a named owner and a kill-switch for each deployment.",
+    "Vet the provenance of models, plugins and any training or retrieval data, and keep secrets, one-line diagrams and credentials out of an AI's context.",
+    "Map your AI risks to MITRE ATLAS and the OWASP Top 10 for LLM Applications, and map your governance to the NIST AI Risk Management Framework.",
+    "Write a one-page AI-in-OT acceptable-use policy, and rehearse an incident in which an AI is manipulated or fails."
+  ];
+  const done=AITEMS.filter((t,i)=>AIDEFDONE[i]).length;
+  return `<div class="eyebrow">AI-era defense &middot; defender-framed</div><h1 class="pg">AI-Era OT Cyber Defense: using AI to protect the plant, and defending the AI you deploy</h1>
+  <p class="msum" style="margin-bottom:14px">Artificial intelligence now sits on both sides of the fence. Used well, it compresses the slow work of defense: it reads the traffic you could never watch by hand, drafts the detection you would have spent a day writing, and turns a wall of advisories into one plain answer about your own plant. Deployed carelessly, it becomes a new way in: an assistant that can be talked into the wrong action, or an agent handed more authority than any attacker should ever be able to borrow. This module gives you the world-standard frameworks for both halves, and the single rule that, in OT, sits above all of them.</p>
+  <div class="fgcallout">The whole of responsible AI, stated the way this academy means it: safety ahead of capability, a human kept in the loop, honesty about what the model cannot do, and defense as the only goal. In a plant that becomes one concrete line: the one authority an AI must never hold is the authority to command the physical process on its own. An AI advises; a human authorizes.</div>
+
+  <section class="msec"><h2>Part 1: AI on the defender's side</h2>
+  <p>The defender's shortage has always been attention. There is more traffic, more logs and more advisories than any team can read, and the one malicious command is hidden in a flood of legitimate ones. This is exactly the work AI is good at, and used inside clear limits it gives a small OT team reach it never had.</p>
+  <div class="tablewrap"><table>
+  <thead><tr><th>Use it for</th><th>What it does for an OT defender</th></tr></thead>
+  <tbody>
+  <tr><td><b>Anomaly &amp; behavioral detection</b></td><td>Baselines what normal OT traffic looks like (Modbus function codes, DNP3, the steady rhythm of polling) and flags the command that is perfectly valid yet never sent before. This is the gap your monitoring module names: a malicious write looks identical to a real one until something has learned normal.</td></tr>
+  <tr><td><b>Alert triage &amp; reduction</b></td><td>Clusters, summarizes and ranks alerts by likely consequence rather than by volume, so the operator sees the few that matter instead of the thousand that do not.</td></tr>
+  <tr><td><b>Threat-intelligence digestion</b></td><td>Turns a CISA ICS advisory or a vendor bulletin into a plain answer to the only question you care about: does this affect my installed base, and what do I do about it?</td></tr>
+  <tr><td><b>Detection engineering</b></td><td>Drafts and explains detection logic, and maps it to MITRE ATT&amp;CK for ICS, so a defender writes better rules faster and understands what each one catches.</td></tr>
+  <tr><td><b>Documentation &amp; runbooks</b></td><td>Drafts incident playbooks, enriches an asset inventory, and writes the after-action notes nobody has time for, leaving the human to check and own them.</td></tr>
+  </tbody></table></div>
+  <div class="fgcallout">The pattern in every row is the same: the AI does the reading, the drafting and the ranking; the human does the deciding. The moment an AI's output can change the state of the plant without a person in between, you have stopped using it as a defender's tool and started building it an attacker's door.</div>
+  </section>
+
+  <section class="msec"><h2>Part 2: securing the AI you deploy</h2>
+  <p>The instant you bring an AI into operations, it becomes part of your attack surface. Two bodies of work describe how that surface is attacked and defended: <b>MITRE ATLAS</b>, which is the ATT&amp;CK-style matrix of real tactics against AI systems, and the <b>OWASP Top 10 for LLM Applications (2025)</b>, which names the recurring weaknesses. Here are the ones that matter most when the AI lives next to a physical process.</p>
+  <div class="tablewrap"><table>
+  <thead><tr><th>Weakness (OWASP LLM, 2025)</th><th>What it looks like in OT</th><th>The defense</th></tr></thead>
+  <tbody>
+  <tr><td><b>Prompt injection</b> (LLM01)</td><td>A hidden instruction rides in something the AI reads: a crafted line in a log, a sentence buried in a device description or a PDF manual, a poisoned alert. The model follows it instead of you. This is the indirect form, and it needs no access to the model at all.</td><td>Treat every ingested input as untrusted. Constrain what the AI is allowed to do so that a hijacked instruction still cannot reach the process.</td></tr>
+  <tr><td><b>Excessive agency</b> (LLM06)</td><td>The highest-consequence case in OT: an agent given tools, write access or permissions beyond what it needs, so that one manipulation turns into one real action on the plant.</td><td>Least privilege. Read-only to OT by default, no standing write to the control plane, and a human approval gate on every action that changes state.</td></tr>
+  <tr><td><b>Improper output handling</b> (LLM05)</td><td>A system takes the model's text and runs it: as a command, a query, or a rule change. The model's suggestion becomes an executed action with no person in between.</td><td>Never wire model output directly into something that acts. Validate and sandbox it; a human turns a suggestion into a change.</td></tr>
+  <tr><td><b>Data &amp; model poisoning</b> (LLM04)</td><td>Tainted training, fine-tuning or retrieval data quietly bends the model's answers, so the assistant you trust is subtly steering you wrong.</td><td>Vet provenance. Control what goes into training and retrieval, and prefer known, vetted sources.</td></tr>
+  <tr><td><b>Sensitive information disclosure</b> (LLM02)</td><td>The AI repeats back a one-line diagram, a config, or a credential someone fed it, handing an attacker the reconnaissance they wanted.</td><td>Keep secrets, diagrams and credentials out of the AI's context, and filter outputs. Govern the data the AI can see.</td></tr>
+  <tr><td><b>Supply chain</b> (LLM03)</td><td>A model, plugin or agent tool of unknown origin carries its own weaknesses or back doors into your environment.</td><td>Vet models and tools as you would any dependency; keep a bill of materials for the AI you run.</td></tr>
+  </tbody></table></div>
+  <div class="fgcallout"><b>Agentic AI is the case to watch.</b> An autonomous agent that can read, reason and act concentrates prompt injection, excessive agency and improper output handling into a single package, and points it at the process. The rule is absolute: an agent in OT is read-only and advisory until a human authorizes each state-changing action. It never holds standing authority over the control plane, because the one thing you cannot afford is an adversary borrowing authority you handed to a machine.</div>
+  </section>
+
+  <section class="msec"><h2>Part 3: when the attacker has AI too</h2>
+  <p>The other half of the story is that adversaries have the same tools. AI compresses reconnaissance that used to take days into minutes: it parses a dense vendor manual to surface default credentials, reads an HMI screenshot and points at the critical pump, turns a device-identity response into a ready list of known weaknesses, and drafts the scripts and the phishing. The <a href="#osint">OSINT unit</a> and the <a href="#aisec">Agentic AI</a> section go deeper on this.</p>
+  <div class="fgcallout">AI changes the attacker's speed, not the laws of physics. A malicious write still has to move a real pump, and that still shows up as a process anomaly to anyone who has baselined normal. So the defenses do not change, they simply matter more: kill every default credential, shrink your public exposure, baseline and monitor your traffic, and keep the human-authorization rule absolute. The faster the attacker's recon, the more the quiet, patient controls are what save you.</div>
+  </section>
+
+  <section class="msec"><h2>Part 4: governing AI in OT, the world standard</h2>
+  <p>You do not have to invent any of this. Four bodies of work, read together, give you a complete governance picture, and each one has a plain job.</p>
+  <div class="tablewrap"><table>
+  <thead><tr><th>Framework</th><th>What it gives you</th></tr></thead>
+  <tbody>
+  <tr><td><b>NIST AI Risk Management Framework</b> (AI RMF 1.0) and its <b>Generative AI Profile</b> (NIST AI 600-1)</td><td>The governance backbone, in four functions: <b>Govern</b> (set the culture, roles and policy), <b>Map</b> (understand each AI's context and consequence), <b>Measure</b> (test and track its risks), and <b>Manage</b> (act on them over the system's life). Map these onto your OT risk program rather than running a separate one.</td></tr>
+  <tr><td><b>CISA &amp; NCSC, Guidelines for Secure AI System Development</b></td><td>Security across the life of an AI system, in four stages: secure design, secure development, secure deployment, and secure operation and maintenance. The OT-friendly backbone for building or buying AI safely.</td></tr>
+  <tr><td><b>MITRE ATLAS</b></td><td>The operational threat layer: the real-world tactics and techniques used against AI systems, so you can test and detect them the way ATT&amp;CK does for the rest of your estate.</td></tr>
+  <tr><td><b>OWASP Top 10 for LLM Applications &amp; Google SAIF</b></td><td>The practitioner's checklist for the weaknesses above, and a secure-by-design framework for AI systems you can hold a vendor or an integrator to.</td></tr>
+  </tbody></table></div>
+  <p>Turn all of it into one page your own site can act on, an <b>AI-in-OT acceptable-use policy</b> that says, in plain words: what AI is allowed where; that nothing autonomous may command the process; that a named human approves every state-changing action; what gets logged; what data an AI may and may not see; how models and tools are vetted; and what you do when an AI is manipulated or fails. A framework you have not written down is one nobody is following.</p>
+  </section>
+
+  <section class="msec"><h2>Worked example: an AI triage assistant for the OT SOC, done right</h2>
+  <p>Say you want the speed of AI without the new risk. You give your OT security team an assistant that helps triage alerts. Here is how the same deployment is either a genuine force-multiplier or a fresh way into the plant, depending entirely on the limits you set.</p>
+  <ol style="max-width:82ch;line-height:1.7">
+  <li><b>Access.</b> The assistant reads alerts, logs and asset data. It has <b>no write path</b> to the control network and cannot change a rule, close an alert, or send a command. Read-only, by design (guards against excessive agency, LLM06).</li>
+  <li><b>Untrusted input.</b> Every alert and log line it ingests is treated as untrusted, because an attacker who can write a log line can try to plant an instruction in it (indirect prompt injection, LLM01). Its permissions are small enough that a hijacked instruction still reaches nothing.</li>
+  <li><b>Output is a suggestion.</b> It proposes a priority and a next step. A human acts; its text is never wired into a firewall, a query or a command (improper output handling, LLM05).</li>
+  <li><b>Data boundaries.</b> No credentials, no one-line diagrams and no secrets sit in its context, so it cannot leak what it was never given (sensitive information disclosure, LLM02).</li>
+  <li><b>Accountability.</b> Every query, tool-call and answer is logged; the deployment has a named owner and a kill-switch; the model and any tools were vetted before use.</li>
+  </ol>
+  <div class="fgcallout">Flip any one of those and the picture changes. Let it auto-close or auto-block, and a crafted log line now steers a real control. Wire its output into a firewall, and its worst hallucination becomes a rule. The design is the defense: the assistant makes the team faster precisely because it was never given the authority that would make it dangerous.</div>
+  </section>
+
+  <section class="msec"><h2>Run the AI-in-OT readiness audit at your site <span class="eyebrow" id="aidefc">${done} / ${AITEMS.length} done</span></h2>
+  <p class="small" style="margin:0 0 6px;color:var(--muted)">Tick each step as you complete it. Progress is saved in your browser.</p>
+  <div class="checks" style="max-width:82ch">${AITEMS.map((t,i)=>`<label class="check${AIDEFDONE[i]?" on":""}"><input type="checkbox" data-aidef="${i}" ${AIDEFDONE[i]?"checked":""}><span>${esc(t)}</span></label>`).join("")}</div>
+  </section>
+
+  <section class="msec"><h2>References &amp; further reading</h2>
+  <p class="sub">The world-standard sources behind this module. Confirm against the current text of each.</p>
+  <div class="res">
+  <a href="https://www.nist.gov/itl/ai-risk-management-framework" target="_blank" rel="noopener">NIST AI Risk Management Framework (AI RMF 1.0): Govern, Map, Measure, Manage</a>
+  <a href="https://nvlpubs.nist.gov/nistpubs/ai/NIST.AI.600-1.pdf" target="_blank" rel="noopener">NIST AI 600-1: Generative AI Profile</a>
+  <a href="https://atlas.mitre.org/" target="_blank" rel="noopener">MITRE ATLAS: Adversarial Threat Landscape for AI Systems</a>
+  <a href="https://genai.owasp.org/llm-top-10/" target="_blank" rel="noopener">OWASP Top 10 for LLM Applications (2025)</a>
+  <a href="https://www.cisa.gov/resources-tools/resources/guidelines-secure-ai-system-development" target="_blank" rel="noopener">CISA &amp; NCSC: Guidelines for Secure AI System Development</a>
+  <a href="https://www.cisa.gov/ai" target="_blank" rel="noopener">CISA: Artificial Intelligence &amp; critical infrastructure</a>
+  <a href="https://saif.google/" target="_blank" rel="noopener">Google Secure AI Framework (SAIF)</a>
+  <a href="https://www.dragos.com/" target="_blank" rel="noopener">Dragos: OT/ICS threat intelligence</a>
+  </div>
+  </section>
+
+  <section class="msec"><h2>Review questions</h2>
+  <p class="sub">Try each one in your own words before you open the answer.</p>
+  <details class="disclose"><summary>1. What is the single rule that overrides every AI framework once an AI is near a physical process?</summary><p>An AI may advise, but only a human authorizes a command to the process. No AI or agent holds standing authority to change the state of the plant on its own. Every other control serves to keep that rule true.</p></details>
+  <details class="disclose"><summary>2. Explain indirect prompt injection with an OT example, and the defense.</summary><p>An attacker hides an instruction in data the AI reads, for example a crafted line in a log or a sentence in a device description, and the model follows it. The defense is to treat all ingested input as untrusted and to constrain the AI's permissions so tightly that a hijacked instruction still cannot reach the process.</p></details>
+  <details class="disclose"><summary>3. Why is "excessive agency" the most dangerous OWASP LLM weakness in OT specifically?</summary><p>Because agency is the bridge from a text mistake to a physical action. An agent given tools or write access beyond its need turns one manipulation into one real command on the plant. Least privilege, read-only access and a human approval gate remove that bridge.</p></details>
+  <details class="disclose"><summary>4. Name the four functions of the NIST AI RMF and what each asks of an OT team.</summary><p>Govern (set policy, roles and culture for AI), Map (understand each AI's context and consequence), Measure (test and track its risks), and Manage (act on those risks across the system's life). An OT team folds these into its existing risk program rather than running a parallel one.</p></details>
+  <details class="disclose"><summary>5. Attackers now use AI for fast reconnaissance. Why does that not change your defensive controls?</summary><p>Because AI changes the attacker's speed, not the physics. A malicious write still has to move real equipment and still appears as a process anomaly to anyone watching. So the same controls hold, they just matter more: kill defaults, shrink exposure, baseline and monitor, and keep human authorization absolute.</p></details>
+  </section>`;
+}
+function bindAidef(){
+  $$(".check input[data-aidef]").forEach(inp=>inp.addEventListener("change",()=>{
+    AIDEFDONE[inp.dataset.aidef]=inp.checked;aidefsave();inp.closest(".check").classList.toggle("on",inp.checked);
+    const items=$$(".check input[data-aidef]");const c=document.getElementById("aidefc");
+    if(c)c.textContent=items.filter(x=>x.checked).length+" / "+items.length+" done";
+  }));
+}
 function viewOsint(){
   const OITEMS=[
     "List your public footprint: domains, IP ranges and ASN, brand names, and the key people an attacker would search for",
@@ -3518,6 +3631,8 @@ let LABSTEP={};try{LABSTEP=JSON.parse(localStorage.getItem("otacademy-labsteps-v
 function labstepsave(){try{localStorage.setItem("otacademy-labsteps-v1",JSON.stringify(LABSTEP));}catch(e){}}
 let OSINTDONE={};try{OSINTDONE=JSON.parse(localStorage.getItem("otacademy-osint-v1"))||{};}catch(e){OSINTDONE={};}
 function osintsave(){try{localStorage.setItem("otacademy-osint-v1",JSON.stringify(OSINTDONE));}catch(e){}}
+let AIDEFDONE={};try{AIDEFDONE=JSON.parse(localStorage.getItem("otacademy-aidef-v1"))||{};}catch(e){AIDEFDONE={};}
+function aidefsave(){try{localStorage.setItem("otacademy-aidef-v1",JSON.stringify(AIDEFDONE));}catch(e){}}
 const LABENV=[
  ["Virtual lab","A hypervisor (VirtualBox, VMware, Proxmox) or GNS3/EVE-NG to build an isolated network of VMs. Nothing here ever touches a production or live OT network."],
  ["Monitoring stack","Security Onion or CISA's Malcolm (both bundle Zeek, Suricata and dashboards with ICS protocol support), or a free Splunk / ELK instance."],
@@ -5308,6 +5423,7 @@ function route(){
   else if(h==="gicsp"){v="gicsp";main.innerHTML=viewGICSP();bindGICSP();}
   else if(h==="examprep"){v="examprep";main.innerHTML=viewExamPrep();bindExamPrep();}
   else if(h==="osint"){v="osint";main.innerHTML=viewOsint();bindOsint();}
+  else if(h==="aidef"){v="aidef";main.innerHTML=viewAidef();bindAidef();}
   else main.innerHTML=viewHome();
   $$("#topnav a").forEach(a=>a.classList.toggle("on",a.dataset.v===v));
   side(cur);meter();bindTrack();window.scrollTo(0,0);
